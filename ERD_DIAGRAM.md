@@ -25,6 +25,7 @@
 │     role: String (enum)     │
 │       - resident            │
 │       - admin               │
+│     pushToken: String       │
 │     isVerified: Boolean     │
 │     createdAt: Date         │
 └─────────────────────────────┘
@@ -38,73 +39,81 @@
       │ *       │         │ *
       │         │         │
       ▼         │         ▼
-┌─────────────────────────────┐      ┌─────────────────────────────┐
-│         REPORT              │      │      ANNOUNCEMENT           │
-│    (report collection)      │      │ (announcements collection)  │
-├─────────────────────────────┤      ├─────────────────────────────┤
-│ PK  _id: ObjectId           │      │ PK  _id: ObjectId           │
-│     title: String           │      │     title: String           │
-│     description: String     │      │     content: String         │
-│ FK  category: String        │──┐   │     category: String (enum) │
-│       (references CATEGORY) │  │   │       - General             │
-│                             │  │   │       - Emergency           │
-│     location: Object        │  │   │       - Event               │
-│       - type: "Point"       │  │   │       - Maintenance         │
-│       - coordinates: [lng,lat] │   │       - Update              │
-│       - address: String     │  │   │                             │
-│                             │  │   │     priority: String (enum) │
-│     photos: Array of Object │  │   │       - low                 │
-│       - filename: String    │  │   │       - normal              │
-│       - path: String        │  │   │       - high                │
-│       - uploadedAt: Date    │  │   │                             │
-│                             │  │   │ FK  author: ObjectId        │
-│     status: String (enum)   │  │   │     isActive: Boolean       │
-│       - pending             │  │   │     expiresAt: Date         │
-│       - in-progress         │  │   │     createdAt: Date         │
-│       - resolved            │  │   └─────────────────────────────┘
-│       - rejected            │  │                 ▲
-│                             │  │                 │ *
-│     priority: String (enum) │  │                 │ creates
-│       - low                 │  │                 │ 1
-│       - medium              │  │                 │
-│       - high                │  └──────────────────
-│       - urgent              │
-│                             │
-│ FK  reporter: ObjectId      │
-│ FK  assignedTo: ObjectId    │───────────┐
-│     resolvedAt: Date        │           │
-│     adminNotes: String      │           │
-│     upvotes: [ObjectId]     │           │
-│     createdAt: Date         │           │
-│     updatedAt: Date         │           │
-└─────────────────────────────┘           │
-      │         │                          │
-      │ 1       │ 1                        │ 1
-      │         │                          │
-      ▼         ▼                          ▼
-   has many  tracked by            creates assignment
-   status    status                       │
-   history   history                      │ *
-      │         │                          │
-      │ *       │ *                        ▼
-      │         │                 ┌─────────────────────────────┐
-      ▼         ▼                 │      ASSIGNMENT             │
-┌─────────────────────────────┐  │  (assignments collection)   │
-│    STATUS_HISTORY           │  ├─────────────────────────────┤
-│ (status_history collection) │  │ PK  _id: ObjectId           │
-├─────────────────────────────┤  │ FK  report_id: ObjectId     │
-│ PK  _id: ObjectId           │  │ FK  worker_id: ObjectId     │
-│ FK  report_id: ObjectId     │  │ FK  assigned_by: ObjectId   │
-│     status: String (enum)   │  │     assigned_at: Date       │
-│       - pending             │  │     completed_at: Date      │
-│       - in-progress         │  │     notes: String           │
-│       - resolved            │  │     status: String (enum)   │
-│       - rejected            │  │       - assigned            │
-│ FK  updated_by: ObjectId    │  │       - in-progress         │
-│     updated_at: Date        │  │       - completed           │
-│     remarks: String         │  │       - cancelled           │
-│     previous_status: String │  └─────────────────────────────┘
-└─────────────────────────────┘
+┌──────────────────────────────────┐      ┌─────────────────────────────┐
+│         REPORT                   │      │      ANNOUNCEMENT           │
+│    (report collection)           │      │ (announcements collection)  │
+├──────────────────────────────────┤      ├─────────────────────────────┤
+│ PK  _id: ObjectId                │      │ PK  _id: ObjectId           │
+│     title: String (max: 200)     │      │     title: String           │
+│     description: String (max: 2K)│      │     content: String         │
+│ FK  category: String (enum)      │──┐   │     category: String (enum) │
+│       (references CATEGORY)      │  │   │       - General             │
+│       - Road Damage              │  │   │       - Emergency           │
+│       - Street Lighting          │  │   │       - Event               │
+│       - Garbage/Waste            │  │   │       - Maintenance         │
+│       - Drainage/Flooding        │  │   │       - Update              │
+│       - Illegal Activity         │  │   │                             │
+│       - Public Safety            │  │   │     priority: String (enum) │
+│       - Infrastructure           │  │   │       - low                 │
+│       - Other                    │  │   │       - normal              │
+│                                  │  │   │       - high                │
+│     location: Object (GeoJSON)   │  │   │                             │
+│       - type: "Point"            │  │   │ FK  author: ObjectId        │
+│       - coordinates: [lng, lat]  │  │   │     isActive: Boolean       │
+│       - address: String          │  │   │     expiresAt: Date         │
+│                                  │  │   │     createdAt: Date         │
+│     photos: Array of Objects     │  │   └─────────────────────────────┘
+│       - filename: String         │  │                 ▲
+│       - path: String             │  │                 ▲
+│       - uploadedAt: Date         │  │                 │ *
+│                                  │  │                 │ creates
+│     status: String (enum)        │  │                 │ 1
+│       - pending                  │  │                 │
+│       - in-progress              │  └──────────────────
+│       - resolved                 │
+│       - rejected                 │
+│                                  │
+│     priority: String (enum)      │
+│       - low                      │
+│       - medium                   │
+│       - high                     │
+│       - urgent                   │
+│                                  │
+│     assignedAgency: String (enum)│
+│       - Barangay Maintenance     │
+│       - Sanitation Department    │
+│       - Traffic Management       │
+│       - Engineering Office       │
+│       - Health Services          │
+│       - Peace and Order          │
+│       - Social Welfare           │
+│       - Not Yet Assigned/null    │
+│                                  │
+│ FK  reporter: ObjectId           │
+│     resolvedAt: Date             │
+│     adminNotes: String           │
+│                                  │
+│     statusHistory: Array of Obj  │
+│       - status: String (enum)    │
+│       - assignedAgency: String   │
+│       - remarks: String          │
+│       - updatedBy: ObjectId (FK) │
+│       - timestamp: Date          │
+│                                  │
+│     upvotes: [ObjectId] (FK)     │
+│     createdAt: Date              │
+│     updatedAt: Date              │
+└──────────────────────────────────┘
+      │
+      │ 1
+      │
+      ▼
+   references
+   category
+      │
+      │ *
+      │
+      ▼
                                           
       ┌──────────────────────────────────────┐
       │         CATEGORY                     │
@@ -142,10 +151,13 @@
 
 ### 3. **report** - Community issue reports
 - Central entity for all community concerns
-- Includes geolocation (GeoJSON format)
-- Multiple photo attachments
-- Simple status tracking (pending/resolved/rejected)
-- **REMOVED**: assignedTo, progressUpdates
+- Includes geolocation (GeoJSON Point format with 2dsphere index)
+- Multiple photo attachments with paths
+- Status tracking: pending → in-progress → resolved/rejected
+- **Agency assignment**: 7 predefined barangay agencies
+- **Status history**: Complete audit trail of all status changes
+- **Upvotes**: Residents can upvote reports to show priority
+- **Admin notes**: Remarks from barangay staff
 
 ### 4. **announcements** - Official barangay announcements
 - Posted by admin only
@@ -179,34 +191,6 @@
 - **Type**: 1:N (One-to-Many)
 - **Reference**: `category` in REPORT references `category_name` in CATEGORY
 - **Description**: Auto-classification by keywords
-
----
-
-## Relationships Explained
-
-### 1. USER → REPORT (One-to-Many)
-- **Relationship**: One user can create many reports
-- **Type**: 1:N (One-to-Many)
-- **Foreign Key**: `reporter` in REPORT references `_id` in USER
-- **Description**: Every report must have a reporter (the user who created it)
-
-### 2. USER → REPORT (Assigned) (One-to-Many)
-- **Relationship**: One staff member can be assigned many reports
-- **Type**: 1:N (One-to-Many)
-- **Foreign Key**: `assignedTo` in REPORT references `_id` in USER
-- **Description**: Admin can assign reports to staff members for handling
-
-### 3. USER ↔ REPORT (Many-to-Many)
-- **Relationship**: Users can upvote multiple reports, reports can have multiple upvotes
-- **Type**: M:N (Many-to-Many)
-- **Implementation**: Array of ObjectIds in `upvotes` field in REPORT
-- **Description**: Community members can upvote reports to show priority
-
-### 4. USER → ANNOUNCEMENT (One-to-Many)
-- **Relationship**: One staff/admin can create many announcements
-- **Type**: 1:N (One-to-Many)
-- **Foreign Key**: `author` in ANNOUNCEMENT references `_id` in USER
-- **Description**: Only staff and admin can create announcements
 
 ---
 
@@ -258,7 +242,7 @@ reportSchema.index({ location: '2dsphere' });
 - `description`: Required, Max length: 2000
 - `category`: Required, References CATEGORY.category_name
 - `location.coordinates`: Required, [longitude, latitude]
-- `status`: Enum (pending, resolved, rejected) - **ONLY 3 STATUSES**
+- `status`: Enum (pending, in-progress, resolved, rejected) - **4 STATUSES**
 - `reporter`: Required, Must reference valid USER
 
 ### ANNOUNCEMENT:
@@ -292,7 +276,7 @@ reportSchema.index({ location: '2dsphere' });
 |---------|--------|-------|
 | Collections | 7 | **4** |
 | User Roles | 3 (resident, staff, admin) | **2 (resident, admin)** |
-| Report Statuses | 4 (pending, in-progress, resolved, rejected) | **3 (pending, resolved, rejected)** |
+| Report Statuses | 4 (pending, in-progress, resolved, rejected) | **4 (pending, in-progress, resolved, rejected)** |
 | Assignment System | Yes ❌ | **No ✅** |
 | Status History | Yes ❌ | **No ✅** |
 | Activity Logs | Yes ❌ | **No ✅** |
@@ -305,30 +289,6 @@ reportSchema.index({ location: '2dsphere' });
 ### REMOVED Fields from REPORT:
 - ❌ **assignedTo** - No worker assignments
 - ❌ **progressUpdates** - No progress tracking needed
-- ❌ **in-progress status** - Simplified to pending/resolved/rejected
-
----
-
-## Field Constraints
-
-### USER:
-- `email`: Required, Unique, Lowercase
-- `password`: Required, Min length: 6, Hashed
-- `role`: Enum (resident, barangay_staff, admin)
-
-### REPORT:
-- `title`: Required, Max length: 200
-- `description`: Required, Max length: 2000
-- `category`: Required, Must be from predefined list
-- `location.coordinates`: Required, [longitude, latitude]
-- `status`: Enum (pending, in-progress, resolved, rejected)
-- `reporter`: Required, Must reference valid USER
-
-### ANNOUNCEMENT:
-- `title`: Required, Max length: 200
-- `content`: Required
-- `category`: Enum (General, Emergency, Event, Maintenance, Update)
-- `author`: Required, Must reference valid USER (staff/admin)
 
 ---
 
@@ -336,25 +296,25 @@ reportSchema.index({ location: '2dsphere' });
 
 ### Report Creation Flow:
 ```
-1. User (reporter) logs in
-2. User creates report with:
+1. Resident logs in to mobile app
+2. Resident creates report with:
    - Title, description, category
-   - GPS coordinates
-   - Photos (uploaded files)
+   - GPS coordinates (automatic)
+   - Photos (camera/gallery)
 3. System creates REPORT document:
-   - reporter = User's _id
+   - reporter = Resident's _id
    - status = "pending"
    - priority = "medium"
    - photos stored in uploads/
-4. Report appears in admin dashboard
-5. Admin assigns report to staff member:
-   - assignedTo = Staff's _id
-6. Staff updates status:
-   - status = "in-progress"
-   - adminNotes = "Scheduled for repair"
-7. After completion:
-   - status = "resolved"
-   - resolvedAt = current timestamp
+4. Report appears in admin dashboard immediately
+5. Admin reviews and updates status:
+   - status = "in-progress" (being worked on)
+   - status = "resolved" (issue fixed)
+   - status = "rejected" (invalid/duplicate)
+   - adminNotes = remarks about the status change
+   - resolvedAt = current timestamp (if resolved)
+6. System sends push notification to resident's device
+7. Resident receives notification with status update
 ```
 
 ### Upvote Flow:
@@ -402,6 +362,7 @@ Table User {
   phone String
   address String
   role String
+  pushToken String
   isVerified Boolean
   createdAt Date
 }
@@ -413,10 +374,9 @@ Table Report {
   category String
   location Object
   photos Array
-  status String
+  status String [note: 'pending, in-progress, resolved, rejected']
   priority String
   reporter ObjectId [ref: > User._id]
-  assignedTo ObjectId [ref: > User._id]
   resolvedAt Date
   adminNotes String
   upvotes Array
@@ -451,8 +411,11 @@ Ref: Report.upvotes *> User._id
 3. ADMIN reviews on dashboard
    ↓
 4. ADMIN updates status:
+   - IN-PROGRESS (being worked on)
    - RESOLVED (issue fixed)
    - REJECTED (invalid)
+   ↓
+5. RESIDENT receives push notification
 ```
 
 **No assignments. No workers. Direct handling by admin.**
@@ -475,3 +438,113 @@ Ref: Report.upvotes *> User._id
 - ✅ Appropriate scope for barangay (500-2000 residents)
 - ✅ Simpler maintenance and training
 - ✅ Faster deployment and testing
+
+---
+
+## 🔔 Push Notifications Feature (PRODUCTION READY)
+
+### Notification Triggers:
+When admin updates report status, the resident who submitted the report will receive a push notification on their mobile device.
+
+### Implementation Overview:
+
+**Technology:** Expo Push Notifications (works in development AND production builds)
+
+#### 1. **User Model Addition:**
+```javascript
+// backend/src/models/User.js
+pushToken: {
+  type: String,
+  default: null
+}
+```
+
+#### 2. **Notification Service (Backend):**
+```javascript
+// backend/src/utils/notificationService.js
+const { Expo } = require('expo-server-sdk');
+const expo = new Expo();
+
+exports.sendPushNotification = async (pushToken, title, body, data) => {
+  if (!Expo.isExpoPushToken(pushToken)) return;
+  
+  await expo.sendPushNotificationsAsync([{
+    to: pushToken,
+    sound: 'default',
+    title,
+    body,
+    data
+  }]);
+};
+```
+
+#### 3. **Report Status Update Integration:**
+```javascript
+// Triggered when admin updates report status
+const reporter = await User.findById(report.reporter);
+if (reporter.pushToken) {
+  await sendPushNotification(
+    reporter.pushToken,
+    'Report Status Updated',
+    `Your report "${report.title}" is now ${report.status}`,
+    { reportId: report._id, status: report.status }
+  );
+}
+```
+
+#### 4. **Mobile App Setup:**
+```javascript
+// Request permissions and register token
+import * as Notifications from 'expo-notifications';
+
+const token = await Notifications.getExpoPushTokenAsync();
+await api.put('/auth/push-token', { pushToken: token.data });
+```
+
+#### 5. **When Notifications Are Sent:**
+- ✅ Report status changed: `pending` → `in-progress`
+- ✅ Report status changed: `in-progress` → `resolved`
+- ✅ Report status changed: any → `rejected`
+- ✅ Admin adds remarks to report
+- ✅ New announcement posted (broadcast to all residents)
+
+#### 6. **Notification Content Examples:**
+```
+Status: In Progress
+Title: "Report In Progress 🔄"
+Body: "Your report 'Broken streetlight' is now being addressed"
+Remarks: "Our team is on the way to fix this issue"
+
+Status: Resolved
+Title: "Report Resolved ✅"
+Body: "Your report 'Broken streetlight' has been resolved"
+Remarks: "The streetlight has been fixed. Thank you for reporting!"
+
+Status: Rejected
+Title: "Report Update ❌"
+Body: "Your report 'Potholes on Main St' status: Rejected"
+Remarks: "This issue is under national highway jurisdiction"
+```
+
+### Production Deployment:
+
+**✅ Works with:**
+- Expo Go (development)
+- Expo standalone builds (APK/IPA)
+- EAS Build (production)
+- Does NOT require Firebase or FCM setup
+
+**Dependencies:**
+- `expo-notifications` (React Native app)
+- `expo-server-sdk` (Node.js backend)
+- Free Expo Push Notification service
+
+**No additional configuration needed for deployment!**
+
+### Privacy & Performance:
+- Tokens stored securely in database
+- Only send to report owner (privacy)
+- Batch notifications for announcements
+- Automatic token refresh on app updates
+
+---
