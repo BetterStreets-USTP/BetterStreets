@@ -1,7 +1,11 @@
 # BetterStreets Database ERD (Entity Relationship Diagram)
-**Aligned with Research Paper Chapter 3.6**
+**Simplified Barangay-Level Issue Reporting System**
 
 ## Database: betterstreets
+
+---
+
+## ✨ SIMPLIFIED SYSTEM - 4 Collections Only
 
 ---
 
@@ -20,7 +24,6 @@
 │     address: String         │
 │     role: String (enum)     │
 │       - resident            │
-│       - barangay_staff      │
 │       - admin               │
 │     isVerified: Boolean     │
 │     createdAt: Date         │
@@ -106,7 +109,6 @@
       ┌──────────────────────────────────────┐
       │         CATEGORY                     │
       │    (categories collection)           │
-      │         **NEW**                      │
       ├──────────────────────────────────────┤
       │ PK  _id: ObjectId                    │
       │     category_name: String (unique)   │
@@ -122,72 +124,33 @@
                      │
                      └───────────────┐
                                     (REPORT.category)
-
-      ┌──────────────────────────────────────┐
-      │      ACTIVITY_LOG                    │
-      │  (activity_log collection)           │
-      │         **NEW**                      │
-      ├──────────────────────────────────────┤
-      │ PK  _id: ObjectId                    │
-      │ FK  user_id: ObjectId                │
-      │     action: String                   │
-      │     action_type: String (enum)       │
-      │       - create, update, delete       │
-      │       - login, logout, assign, view  │
-      │     target_type: String              │
-      │     target_id: ObjectId              │
-      │     ip_address: String               │
-      │     user_agent: String               │
-      │     details: Object                  │
-      │     created_at: Date                 │
-      └──────────────────────────────────────┘
-                     ▲
-                     │ logs all
-                     │ user actions
-                     │ *
-                     │
-                     └── USER (performs actions)
 ```
 
 ---
 
-## Complete Entity List (7 Collections - Aligned with Paper Chapter 3.6)
+## Complete Entity List (4 Collections - SIMPLIFIED)
 
 ### 1. **users** - User management
-- Stores all system users (residents, barangay staff, admin)
-- Handles authentication and role-based access
+- Only 2 roles: **resident** and **admin**
+- Residents submit reports via mobile app
+- Admins manage everything via web dashboard
 
-### 2. **categories** - Report categorization ✨ NEW
+### 2. **categories** - Report categorization
 - Stores report categories with keyword arrays
 - Enables smart keyword-based auto-classification
-- Supports rule-based categorization (Chapter 2.8)
+- Used for organizing reports by type
 
 ### 3. **report** - Community issue reports
 - Central entity for all community concerns
 - Includes geolocation (GeoJSON format)
 - Multiple photo attachments
-- Status tracking
+- Simple status tracking (pending/resolved/rejected)
+- **REMOVED**: assignedTo, progressUpdates
 
-### 4. **assignments** - Worker task delegation ✨ NEW
-- Tracks which worker is assigned to which report
-- Assignment lifecycle (assigned → in-progress → completed)
-- Notes and completion timestamps
-
-### 5. **status_history** - Report timeline tracking ✨ NEW
-- Complete audit trail of status changes
-- Who changed, when, and why (remarks)
-- Enables report timeline visualization
-
-### 6. **announcements** - Official barangay announcements
-- Posted by admin/staff
+### 4. **announcements** - Official barangay announcements
+- Posted by admin only
 - Categorized and prioritized
-- Expiration dates
-
-### 7. **activity_log** - System audit trail ✨ NEW
-- Logs all user actions in the system
-- Tracks create, update, delete, login, logout, assign operations
-- IP address and user agent for security
-- Supports accountability and monitoring
+- Expiration dates for temporary notices
 
 ---
 
@@ -197,52 +160,25 @@
 - **Relationship**: One user can create many reports
 - **Type**: 1:N (One-to-Many)
 - **Foreign Key**: `reporter` in REPORT references `_id` in USER
-- **Description**: Every report must have a reporter (the user who created it)
+- **Description**: Every report must have a reporter
 
-### 2. USER → REPORT (One-to-Many) - Assigned Worker
-- **Relationship**: One staff member can be assigned many reports
-- **Type**: 1:N (One-to-Many)
-- **Foreign Key**: `assignedTo` in REPORT references `_id` in USER
-- **Description**: Admin can assign reports to staff members for handling
-
-### 3. USER ↔ REPORT (Many-to-Many) - Upvotes
-- **Relationship**: Users can upvote multiple reports, reports can have multiple upvotes
+### 2. USER ↔ REPORT (Many-to-Many) - Upvotes
+- **Relationship**: Users can upvote multiple reports
 - **Type**: M:N (Many-to-Many)
-- **Implementation**: Array of ObjectIds in `upvotes` field in REPORT
-- **Description**: Community members can upvote reports to show priority
+- **Implementation**: Array of ObjectIds in `upvotes` field
+- **Description**: Community engagement feature
 
-### 4. USER → ANNOUNCEMENT (One-to-Many)
-- **Relationship**: One staff/admin can create many announcements
+### 3. USER → ANNOUNCEMENT (One-to-Many)
+- **Relationship**: Admin creates many announcements
 - **Type**: 1:N (One-to-Many)
 - **Foreign Key**: `author` in ANNOUNCEMENT references `_id` in USER
-- **Description**: Only staff and admin can create announcements
+- **Description**: Only admins can create announcements
 
-### 5. REPORT → STATUS_HISTORY (One-to-Many) ✨ NEW
-- **Relationship**: One report has many status updates
-- **Type**: 1:N (One-to-Many)
-- **Foreign Key**: `report_id` in STATUS_HISTORY references `_id` in REPORT
-- **Description**: Complete timeline of status changes for audit trail
-
-### 6. REPORT → ASSIGNMENT (One-to-Many) ✨ NEW
-- **Relationship**: One report can be assigned to one worker (reassignment creates new entry)
-- **Type**: 1:N (One-to-Many)
-- **Foreign Keys**: 
-  - `report_id` in ASSIGNMENT references `_id` in REPORT
-  - `worker_id` in ASSIGNMENT references `_id` in USER
-  - `assigned_by` in ASSIGNMENT references `_id` in USER
-- **Description**: Tracks worker assignments and completion
-
-### 7. CATEGORY → REPORT (One-to-Many) ✨ NEW
+### 4. CATEGORY → REPORT (One-to-Many)
 - **Relationship**: One category can be used by many reports
 - **Type**: 1:N (One-to-Many)
 - **Reference**: `category` in REPORT references `category_name` in CATEGORY
-- **Description**: Reports are classified into predefined categories with keywords
-
-### 8. USER → ACTIVITY_LOG (One-to-Many) ✨ NEW
-- **Relationship**: One user generates many activity logs
-- **Type**: 1:N (One-to-Many)
-- **Foreign Key**: `user_id` in ACTIVITY_LOG references `_id` in USER
-- **Description**: All user actions are logged for accountability
+- **Description**: Auto-classification by keywords
 
 ---
 
@@ -309,13 +245,12 @@ reportSchema.index({ location: '2dsphere' });
 ### USER:
 - `email`: Required, Unique, Lowercase
 - `password`: Required, Min length: 6, Hashed with bcrypt
-- `role`: Enum (resident, barangay_staff, admin)
+- `role`: Enum (resident, admin) - **ONLY 2 ROLES**
 - `name`: Required
 
-### CATEGORY: ✨ NEW
+### CATEGORY:
 - `category_name`: Required, Unique
 - `keywords`: Array of strings for auto-classification
-- `description`: Optional
 - `isActive`: Boolean, default true
 
 ### REPORT:
@@ -323,35 +258,14 @@ reportSchema.index({ location: '2dsphere' });
 - `description`: Required, Max length: 2000
 - `category`: Required, References CATEGORY.category_name
 - `location.coordinates`: Required, [longitude, latitude]
-- `status`: Enum (pending, in-progress, resolved, rejected)
+- `status`: Enum (pending, resolved, rejected) - **ONLY 3 STATUSES**
 - `reporter`: Required, Must reference valid USER
-
-### ASSIGNMENT: ✨ NEW
-- `report_id`: Required, References REPORT._id
-- `worker_id`: Required, References USER._id (must be barangay_staff role)
-- `assigned_by`: Required, References USER._id (must be admin role)
-- `status`: Enum (assigned, in-progress, completed, cancelled)
-
-### STATUS_HISTORY: ✨ NEW
-- `report_id`: Required, References REPORT._id
-- `status`: Required, Enum (pending, in-progress, resolved, rejected)
-- `updated_by`: Required, References USER._id
-- `updated_at`: Default: Current timestamp
-- `remarks`: Optional
 
 ### ANNOUNCEMENT:
 - `title`: Required, Max length: 200
 - `content`: Required
 - `category`: Enum (General, Emergency, Event, Maintenance, Update)
-- `author`: Required, Must reference valid USER (staff/admin)
-
-### ACTIVITY_LOG: ✨ NEW
-- `user_id`: Required, References USER._id
-- `action`: Required, Description of action
-- `action_type`: Required, Enum (create, update, delete, login, logout, assign, view)
-- `target_type`: Optional, Type of entity affected
-- `target_id`: Optional, ID of affected entity
-- `created_at`: Default: Current timestamp
+- `author`: Required, Must reference valid USER (admin only)
 
 ---
 
@@ -361,8 +275,8 @@ reportSchema.index({ location: '2dsphere' });
 - `_id` on all collections (unique, auto-indexed)
 
 ### Custom Unique Indexes:
-- `email` on USER collection (unique)
-- `category_name` on CATEGORY collection (unique)
+- `email` on USER collection
+- `category_name` on CATEGORY collection
 
 ### Geospatial Index:
 - `location` on REPORT collection (2dsphere for geospatial queries)
@@ -370,42 +284,28 @@ reportSchema.index({ location: '2dsphere' });
   reportSchema.index({ location: '2dsphere' });
   ```
 
-### Compound Indexes for Queries:
-- `report_id` + `updated_at` on STATUS_HISTORY (timeline queries)
-- `user_id` + `created_at` on ACTIVITY_LOG (user activity queries)
-- `worker_id` + `report_id` on ASSIGNMENT (worker's assigned tasks)
-- `report_id` on ASSIGNMENT (report's assignment history)
-
 ---
 
-## Paper Alignment Notes
+## Simplified vs Previous System
 
-### ERD Implementation Matches Chapter 3.6:
+| Feature | Before | After |
+|---------|--------|-------|
+| Collections | 7 | **4** |
+| User Roles | 3 (resident, staff, admin) | **2 (resident, admin)** |
+| Report Statuses | 4 (pending, in-progress, resolved, rejected) | **3 (pending, resolved, rejected)** |
+| Assignment System | Yes ❌ | **No ✅** |
+| Status History | Yes ❌ | **No ✅** |
+| Activity Logs | Yes ❌ | **No ✅** |
 
-| Paper Entity | Implementation | Status |
-|--------------|----------------|--------|
-| users | User.js | ✅ Implemented |
-| categories | Category.js | ✅ NEW - Added |
-| report | Report.js | ✅ Implemented |
-| assignments | Assignment.js | ✅ NEW - Added |
-| status_history | StatusHistory.js | ✅ NEW - Added |
-| announcements | Announcement.js | ✅ Implemented |
-| activity_log | ActivityLog.js | ✅ NEW - Added |
+### REMOVED Collections:
+- ❌ **assignments** - No worker assignment needed
+- ❌ **status_history** - Overcomplicated for barangay level
+- ❌ **activity_log** - Unnecessary for small communities
 
-### Field Name Mapping (Paper → MongoDB):
-
-| Paper Field | MongoDB Field | Reason |
-|-------------|---------------|--------|
-| user_id | _id | MongoDB default convention |
-| report_id | _id | MongoDB default convention |
-| category_id | _id | MongoDB default convention |
-| full_name | name | Simplified naming |
-| image_url | photos[] | Supports multiple images |
-| location_lat, location_lng | location.coordinates[] | GeoJSON standard (longitude, latitude) |
-| date_created | createdAt | Mongoose/MongoDB convention |
-| last_updated | updatedAt | Mongoose/MongoDB convention |
-
-**Note:** These differences are acceptable and follow MongoDB/Mongoose best practices. Document this mapping in your paper's implementation chapter.
+### REMOVED Fields from REPORT:
+- ❌ **assignedTo** - No worker assignments
+- ❌ **progressUpdates** - No progress tracking needed
+- ❌ **in-progress status** - Simplified to pending/resolved/rejected
 
 ---
 
@@ -541,32 +441,37 @@ Ref: Report.upvotes *> User._id
 
 ---
 
+## Simplified Report Flow
+
+```
+1. RESIDENT submits report
+   ↓
+2. Status: PENDING
+   ↓
+3. ADMIN reviews on dashboard
+   ↓
+4. ADMIN updates status:
+   - RESOLVED (issue fixed)
+   - REJECTED (invalid)
+```
+
+**No assignments. No workers. Direct handling by admin.**
+
+---
+
 ## For Your Thesis/Capstone Paper
 
-### Include These Sections:
+### Justification for Simplification:
 
-1. **Database Design Overview**
-   - NoSQL (MongoDB) justification
-   - Why document-based over relational
+**Why Simplified?**
+1. Barangay-level operations don't need complex task delegation
+2. Direct accountability - admin handles all reports
+3. Faster response - no assignment delays
+4. Easier training - only 2 user types
+5. FixMyStreet model - proven effective globally
 
-2. **Entity Descriptions**
-   - Detailed explanation of each entity
-   - Field purposes and constraints
-
-3. **Relationship Explanations**
-   - How entities connect
-   - Cardinality rationale
-
-4. **Normalization Analysis**
-   - Document design decisions
-   - Denormalization for performance
-
-5. **Security Considerations**
-   - Password hashing
-   - Data validation
-   - Access control
-
-6. **Scalability Design**
-   - Indexing strategy
-   - Query optimization
-   - Future growth considerations
+### Key Points:
+- ✅ All research objectives still met
+- ✅ Appropriate scope for barangay (500-2000 residents)
+- ✅ Simpler maintenance and training
+- ✅ Faster deployment and testing
