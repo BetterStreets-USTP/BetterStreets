@@ -12,127 +12,77 @@
 ## Entities and Relationships
 
 ```
-┌─────────────────────────────┐
-│         USER                │
-│    (users collection)       │
-├─────────────────────────────┤
-│ PK  _id: ObjectId           │
-│     name: String            │
-│     email: String (unique)  │
-│     password: String (hash) │
-│     phone: String           │
-│     address: String         │
-│     role: String (enum)     │
-│       - resident            │
-│       - admin               │
-│     pushToken: String       │
-│     isVerified: Boolean     │
-│     createdAt: Date         │
-└─────────────────────────────┘
-      │         │         │
-      │ 1       │ 1       │ 1
-      │         │         │
-      ▼         │         ▼
-   creates      │      creates
-   reports      │   announcements
-      │         │         │
-      │ *       │         │ *
-      │         │         │
-      ▼         │         ▼
-┌──────────────────────────────────┐      ┌─────────────────────────────┐
-│         REPORT                   │      │      ANNOUNCEMENT           │
-│    (report collection)           │      │ (announcements collection)  │
-├──────────────────────────────────┤      ├─────────────────────────────┤
-│ PK  _id: ObjectId                │      │ PK  _id: ObjectId           │
-│     title: String (max: 200)     │      │     title: String           │
-│     description: String (max: 2K)│      │     content: String         │
-│ FK  category: String (enum)      │──┐   │     category: String (enum) │
-│       (references CATEGORY)      │  │   │       - General             │
-│       - Road Damage              │  │   │       - Emergency           │
-│       - Street Lighting          │  │   │       - Event               │
-│       - Garbage/Waste            │  │   │       - Maintenance         │
-│       - Drainage/Flooding        │  │   │       - Update              │
-│       - Illegal Activity         │  │   │                             │
-│       - Public Safety            │  │   │     priority: String (enum) │
-│       - Infrastructure           │  │   │       - low                 │
-│       - Other                    │  │   │       - normal              │
-│                                  │  │   │       - high                │
-│     location: Object (GeoJSON)   │  │   │                             │
-│       - type: "Point"            │  │   │ FK  author: ObjectId        │
-│       - coordinates: [lng, lat]  │  │   │     isActive: Boolean       │
-│       - address: String          │  │   │     expiresAt: Date         │
-│                                  │  │   │     createdAt: Date         │
-│     photos: Array of Objects     │  │   └─────────────────────────────┘
-│       - filename: String         │  │                 ▲
-│       - path: String             │  │                 ▲
-│       - uploadedAt: Date         │  │                 │ *
-│                                  │  │                 │ creates
-│     status: String (enum)        │  │                 │ 1
-│       - pending                  │  │                 │
-│       - in-progress              │  └──────────────────
-│       - resolved                 │
-│       - rejected                 │
-│                                  │
-│     priority: String (enum)      │
-│       - low                      │
-│       - medium                   │
-│       - high                     │
-│       - urgent                   │
-│                                  │
-│     assignedAgency: String (enum)│
-│       - Barangay Maintenance     │
-│         Team                     │
-│       - Sanitation Department    │
-│       - Traffic Management       │
-│       - Engineering Office       │
-│       - Health Services          │
-│       - Peace and Order          │
-│       - Social Welfare           │
-│       - Not Yet Assigned/null    │
-│                                  │
-│ FK  reporter: ObjectId           │
-│     resolvedAt: Date             │
-│     adminNotes: String           │
-│                                  │
-│     statusHistory: Array of Obj  │
-│       - status: String (enum)    │
-│       - assignedAgency: String   │
-│       - remarks: String          │
-│       - updatedBy: ObjectId (FK) │
-│       - timestamp: Date          │
-│                                  │
-│     createdAt: Date              │
-│     updatedAt: Date              │
-└──────────────────────────────────┘
-      │
-      │ 1
-      │
-      ▼
-   references
-   category
-      │
-      │ *
-      │
-      ▼
-                                          
-      ┌──────────────────────────────────────┐
-      │         CATEGORY                     │
-      │    (categories collection)           │
-      ├──────────────────────────────────────┤
-      │ PK  _id: ObjectId                    │
-      │     category_name: String (unique)   │
-      │     keywords: [String]               │
-      │       (for auto-classification)      │
-      │     description: String              │
-      │     color: String                    │
-      │     isActive: Boolean                │
-      │     createdAt: Date                  │
-      └──────────────────────────────────────┘
-                     ▲
-                     │ references
-                     │
-                     └───────────────┐
-                                    (REPORT.category)
+┌─────────────────────────────────┐
+│              User               │
+├────────┬────────────────────────┤
+│   PK   │ user_id                │ ObjectId
+│        │ full_name              │ VARCHAR
+│        │ email                  │ VARCHAR
+│        │ password               │ VARCHAR
+│        │ role                   │ ENUM
+│        │ phone_number           │ VARCHAR
+│        │ address                │ VARCHAR
+│        │ pushToken              │ VARCHAR
+│        │ isVerified             │ Boolean
+│        │ date_created           │ DATETIME
+└────────┴────────────────────────┘
+            │         │         
+            │ 1       │ 1       
+            │         │         
+            ▼         ▼         
+         creates   creates    
+         reports   announcements
+            │         │         
+            │ *       │ *       
+            │         │         
+            ▼         ▼         
+┌─────────────────────────────────┐      ┌─────────────────────────────────┐
+│             Report              │      │         Announcements           │
+├────────┬────────────────────────┤      ├────────┬────────────────────────┤
+│   PK   │ report_id              │ ObjectId   PK   │ announcement_id        │ ObjectId
+│   FK   │ user_id                │ ObjectId        │ title                  │ VARCHAR
+│   FK   │ category_id            │ ObjectId        │ message                │ TEXT
+│        │ description            │ TEXT       FK   │ created_by             │ ObjectId
+│        │ image_url              │ VARCHAR         │ created_at             │ DATETIME
+│        │ location_lat           │ DOUBLE    └─────┴────────────────────────┘
+│        │ location_lng           │ DOUBLE
+│        │ status                 │ ENUM
+│        │ priority               │ ENUM
+│        │ assignedAgency         │ VARCHAR
+│        │ resolvedAt             │ DATETIME
+│        │ adminNotes             │ TEXT
+│        │ date_created           │ DATETIME
+│        │ last_updated           │ DATETIME
+├────────┴────────────────────────┤
+│     Embedded: statusHistory     │
+├────────┬────────────────────────┤
+│        │ status                 │ ENUM
+│        │ assignedAgency         │ VARCHAR
+│        │ remarks                │ TEXT
+│   FK   │ updatedBy              │ ObjectId
+│        │ timestamp              │ DATETIME
+└────────┴────────────────────────┘
+            │
+            │ 1
+            │
+            ▼
+         references
+         category
+            │
+            │ *
+            │
+            ▼
+┌─────────────────────────────────┐
+│           Categories            │
+├────────┬────────────────────────┤
+│   PK   │ category_id            │ ObjectId
+│        │ category_name          │ VARCHAR
+│        │ keywords               │ TEXT
+│        │ description            │ TEXT
+│        │ color                  │ VARCHAR
+│        │ isActive               │ Boolean
+│        │ date_created           │ DATETIME
+└────────┴────────────────────────┘
 ```
 
 ---
