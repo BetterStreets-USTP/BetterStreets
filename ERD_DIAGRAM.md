@@ -81,6 +81,7 @@
 │                                  │
 │     assignedAgency: String (enum)│
 │       - Barangay Maintenance     │
+│         Team                     │
 │       - Sanitation Department    │
 │       - Traffic Management       │
 │       - Engineering Office       │
@@ -100,7 +101,6 @@
 │       - updatedBy: ObjectId (FK) │
 │       - timestamp: Date          │
 │                                  │
-│     upvotes: [ObjectId] (FK)     │
 │     createdAt: Date              │
 │     updatedAt: Date              │
 └──────────────────────────────────┘
@@ -156,7 +156,6 @@
 - Status tracking: pending → in-progress → resolved/rejected
 - **Agency assignment**: 7 predefined barangay agencies
 - **Status history**: Complete audit trail of all status changes
-- **Upvotes**: Residents can upvote reports to show priority
 - **Admin notes**: Remarks from barangay staff
 
 ### 4. **announcements** - Official barangay announcements
@@ -174,19 +173,13 @@
 - **Foreign Key**: `reporter` in REPORT references `_id` in USER
 - **Description**: Every report must have a reporter
 
-### 2. USER ↔ REPORT (Many-to-Many) - Upvotes
-- **Relationship**: Users can upvote multiple reports
-- **Type**: M:N (Many-to-Many)
-- **Implementation**: Array of ObjectIds in `upvotes` field
-- **Description**: Community engagement feature
-
-### 3. USER → ANNOUNCEMENT (One-to-Many)
+### 2. USER → ANNOUNCEMENT (One-to-Many)
 - **Relationship**: Admin creates many announcements
 - **Type**: 1:N (One-to-Many)
 - **Foreign Key**: `author` in ANNOUNCEMENT references `_id` in USER
 - **Description**: Only admins can create announcements
 
-### 4. CATEGORY → REPORT (One-to-Many)
+### 3. CATEGORY → REPORT (One-to-Many)
 - **Relationship**: One category can be used by many reports
 - **Type**: 1:N (One-to-Many)
 - **Reference**: `category` in REPORT references `category_name` in CATEGORY
@@ -317,16 +310,6 @@ reportSchema.index({ location: '2dsphere' });
 7. Resident receives notification with status update
 ```
 
-### Upvote Flow:
-```
-1. User views report
-2. User clicks upvote
-3. System checks if User's _id exists in report.upvotes[]
-4. If not exists: Add User's _id to upvotes[]
-5. If exists: Remove User's _id from upvotes[]
-6. Return updated upvote count
-```
-
 ---
 
 ## Database Statistics (For Documentation)
@@ -379,7 +362,7 @@ Table Report {
   reporter ObjectId [ref: > User._id]
   resolvedAt Date
   adminNotes String
-  upvotes Array
+  statusHistory Array
   createdAt Date
   updatedAt Date
 }
@@ -395,8 +378,6 @@ Table Announcement {
   expiresAt Date
   createdAt Date
 }
-
-Ref: Report.upvotes *> User._id
 ```
 
 ---
