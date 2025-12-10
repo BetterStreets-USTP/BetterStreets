@@ -23,7 +23,6 @@
 │        │ phone_number           │ VARCHAR
 │        │ address                │ VARCHAR
 │        │ pushToken              │ VARCHAR
-│        │ isVerified             │ Boolean
 │        │ date_created           │ DATETIME
 └────────┴────────────────────────┘
             │         │         
