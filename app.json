@@ -1,0 +1,91 @@
+{
+  "expo": {
+    "name": "BetterStreets",
+    "slug": "betterstreets-camaman-an",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "platforms": [
+      "android",
+      "ios"
+    ],
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#4CAF7D"
+    },
+    "assetBundlePatterns": [
+      "**/*"
+    ],
+    "ios": {
+      "supportsTablet": true,
+      "bundleIdentifier": "com.betterstreets.app"
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#4CAF7D"
+      },
+      "permissions": [
+        "android.permission.ACCESS_FINE_LOCATION",
+        "android.permission.ACCESS_COARSE_LOCATION",
+        "android.permission.CAMERA",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.RECEIVE_BOOT_COMPLETED",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "package": "com.betterstreets.app",
+      "googleServicesFile": "./google-services.json",
+      "useNextNotificationsApi": true
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      [
+        "expo-location",
+        {
+          "locationAlwaysAndWhenInUsePermission": "Allow BetterStreets to use your location to tag reports."
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Allow BetterStreets to access your camera to capture issue photos."
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Allow BetterStreets to access your photos to attach to reports."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/notification-icon.png",
+          "color": "#10B981",
+          "sounds": [
+            "./assets/notification-sound.wav"
+          ],
+          "androidMode": "default",
+          "androidCollapsedTitle": "BetterStreets"
+        }
+      ]
+    ],
+    "notification": {
+      "icon": "./assets/notification-icon.png",
+      "color": "#10B981",
+      "androidMode": "default",
+      "androidCollapsedTitle": "#{unread_notifications} new updates"
+    },
+    "extra": {
+      "eas": {
+        "projectId": "011652a1-dde7-4006-858b-2b3893dc077f"
+      }
+    },
+    "owner": "jetrwu"
+  }
+}

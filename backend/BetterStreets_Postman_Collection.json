@@ -1,0 +1,343 @@
+{
+  "info": {
+    "name": "BetterStreets API",
+    "description": "Complete API collection for BetterStreets Barangay Reporting System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan Dela Cruz\",\n  \"email\": \"juan@example.com\",\n  \"password\": \"password123\",\n  \"phone\": \"09123456789\",\n  \"address\": \"Camaman-an, Cagayan de Oro City\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/register",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "auth", "register"]
+            }
+          }
+        },
+        {
+          "name": "Login User",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"juan@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/login",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "auth", "login"]
+            }
+          }
+        },
+        {
+          "name": "Get My Profile",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/auth/me",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "auth", "me"]
+            }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Juan Updated\",\n  \"phone\": \"09987654321\",\n  \"address\": \"New Address\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/auth/profile",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "auth", "profile"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Reports",
+      "item": [
+        {
+          "name": "Get All Reports",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/reports",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "reports"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Report",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/reports/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "reports", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "REPORT_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Report (No Photos)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Pothole on Main Street\",\n  \"description\": \"Large pothole causing traffic issues and potential accidents\",\n  \"category\": \"Road Damage\",\n  \"location\": {\n    \"latitude\": 8.4833,\n    \"longitude\": 124.6500\n  },\n  \"address\": \"Main Street, Camaman-an, CDO\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/reports",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "reports"]
+            }
+          }
+        },
+        {
+          "name": "Get My Reports",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/reports/user/my-reports",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "reports", "user", "my-reports"]
+            }
+          }
+        },
+        {
+          "name": "Upvote Report",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer YOUR_TOKEN_HERE"
+              }
+            ],
+            "url": {
+              "raw": "http://localhost:3000/api/reports/:id/upvote",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "reports", ":id", "upvote"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "REPORT_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Report Status (Admin/Staff)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer ADMIN_TOKEN_HERE"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"in-progress\",\n  \"priority\": \"high\",\n  \"adminNotes\": \"Scheduled for repair next week\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/reports/:id/status",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "reports", ":id", "status"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "REPORT_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Heatmap Data",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/reports/heatmap",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "reports", "heatmap"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Announcements",
+      "item": [
+        {
+          "name": "Get All Announcements",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/announcements",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "announcements"]
+            }
+          }
+        },
+        {
+          "name": "Get Single Announcement",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:3000/api/announcements/:id",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "announcements", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "ANNOUNCEMENT_ID_HERE"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Announcement (Staff/Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer STAFF_TOKEN_HERE"
+              },
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Community Clean-up Drive\",\n  \"content\": \"Join us this Saturday for a community clean-up drive. Meeting at the barangay hall at 7:00 AM.\",\n  \"category\": \"Event\",\n  \"priority\": \"normal\"\n}"
+            },
+            "url": {
+              "raw": "http://localhost:3000/api/announcements",
+              "protocol": "http",
+              "host": ["localhost"],
+              "port": "3000",
+              "path": ["api", "announcements"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "http://localhost:3000/api/health",
+          "protocol": "http",
+          "host": ["localhost"],
+          "port": "3000",
+          "path": ["api", "health"]
+        }
+      }
+    }
+  ]
+}
