@@ -382,13 +382,18 @@ For testing purposes, you can use:
 ## Support
 
 For issues or questions:
-- **Email**: support@betterstreets.com
-- **Phone**: (Barangay Contact Number)
+- **Email**: jetrwu@gmail.com
+- **Phone**: +63 908 767 1312
 
 ## Contributors
 
 **Capstone Project Team**
-- [Your Names Here]
+- Dela Cruz, Jetrho V.
+- Rosales, Paulo C.
+- Jagualing, Jeanne B.
+- Radiaganding, James Marl L.
+- Urbina, JohnRiel B.
+
 
 **Barangay Camaman-an**
 Cagayan de Oro City
