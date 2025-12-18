@@ -1,53 +1,32 @@
-# 🌟 BetterStreets - Barangay Community Issue Reporting System
+# BetterStreets - Barangay Community Issue Reporting System
 
-**Production-Ready | Fully Functional | Push Notifications | Status Timeline**
+A mobile-based community issue reporting system for Barangay Camaman-an, Cagayan de Oro City, enabling residents to report community concerns with photos, GPS location, and real-time status tracking.
 
-A modern, community-focused system for Barangay Camaman-an, Cagayan de Oro City. Residents report issues via mobile app, barangay staff manage them via web dashboard, with complete transparency through status history and push notifications.
+## 📱 Features
 
-![Version](https://img.shields.io/badge/version-1.0.0-green)
-![Status](https://img.shields.io/badge/status-production--ready-brightgreen)
-![React Native](https://img.shields.io/badge/React%20Native-0.76.5-blue)
-![Expo](https://img.shields.io/badge/Expo-SDK%2054-blue)
-![Node.js](https://img.shields.io/badge/Node.js-18+-green)
-![MongoDB](https://img.shields.io/badge/MongoDB-7.0-brightgreen)
+- **Mobile App (React Native + Expo)**
+  - User registration with email verification (OTP)
+  - Report submission with photo capture and GPS location
+  - Offline report storage with automatic synchronization
+  - Real-time report status tracking
+  - Community announcements
+  - Interactive heatmap visualization
+  - Forgot password functionality
 
----
+- **Admin Dashboard (React + Vite)**
+  - Secure admin/worker authentication
+  - Real-time dashboard statistics
+  - Report management with status updates
+  - Announcement broadcasting
+  - Interactive heatmap for issue analysis
+  - Category and status filtering
 
-## 🚀 Quick Links
-
-- **[Setup Guide](./SETUP_GUIDE.md)** - Complete installation instructions
-- **[Features Documentation](./FEATURES.md)** - All features explained
-- **[ERD Diagram](./backend/ERD_DIAGRAM.md)** - Database structure
-- **[Backend API](./backend/README.md)** - API documentation
-- **[Admin Dashboard](./admin-dashboard/README.md)** - Web dashboard guide
-
----
-
-## ✨ Key Features
-
-### 📱 **Mobile App (Residents)**
-- **Report Submission**: Submit community issues with photos, GPS location, and description
-- **Smart Auto-Classification**: AI-powered category suggestion based on keywords
-- **Dual Reports View**: 
-  - All Reports: See all community reports
-  - My Reports: Track your own submissions
-- **Status Timeline**: Complete audit trail from submission to resolution
-- **Notification Center**: 
-  - View all announcements & report updates
-  - Unread badge on tab icon
-  - Mark as read/unread tracking
-  - Pull-to-refresh support
-- **Push Notifications**: Get notified when barangay updates your report
-- **Agency Visibility**: See which barangay department is handling your issue
-- **Full-Screen Photo Viewer**: Tap photos to view in full screen with zoom
-- **Profile Management**: Edit name, phone, address; manage notification settings
-- **Offline Mode**: Submit reports without internet, auto-sync later
-- **Modern UI**: Floating tab bar with 5 tabs (Home, Reports, Add, Notifications, Profile)
-
-### 🌐 **Admin Dashboard (Barangay Staff)**
-- **Report Management**: View, filter, and update all reports
-- **Agency Assignment**: Assign reports to specific barangay departments:
-  - Barangay Maintenance Team
+- **Backend API (Node.js + Express)**
+  - RESTful API with JWT authentication
+  - MongoDB database integration
+  - Email notifications (OTP, verification, password reset)
+  - File upload handling
+  - Role-based access control (resident, worker, admin)
   - Sanitation Department
   - Traffic Management
   - Engineering Office
@@ -68,78 +47,136 @@ A modern, community-focused system for Barangay Camaman-an, Cagayan de Oro City.
 - Automatic on status changes
 
 ### 📖 **Transparency & Accountability**
-- **Status History**: Every update logged with timestamp
-- **Agency Tracking**: Know exactly who's handling what
-- **Admin Remarks**: Read barangay staff comments
-- **Timeline Visualization**: Color-coded status progression
-- **Complete Audit Trail**: From pending → in-progress → resolved/rejected
-- **Notification Feed**: All updates in one place with unread tracking
 
----
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js (v18 or higher)
+- MongoDB (running on localhost:27017)
+- Git
+
+### Installation
+
+1. **Clone the repository**
+```bash
+git clone https://github.com/BetterStreets-USTP/BetterStreets.git
+cd BetterStreets
+```
+
+2. **Setup Backend**
+```bash
+cd backend
+npm install
+# Create .env file (see backend/.env.example)
+node src/scripts/createNewAdmin.js  # Create admin account
+npm run dev  # Starts on port 3000
+```
+
+3. **Setup Mobile App**
+```bash
+cd ..
+npm install
+npm start  # Opens Expo Developer Tools
+```
+
+4. **Setup Admin Dashboard**
+```bash
+cd admin-dashboard
+npm install
+npm run dev  # Starts on port 5173
+```
+
+## 📚 Documentation
+
+- **[Installation Instructions](INSTALLATION_INSTRUCTIONS.md)** - Comprehensive setup guide
+- **[Features Documentation](FEATURES.md)** - Detailed feature descriptions
+- **[Backend API Documentation](backend/README.md)** - API endpoints and usage
+- **[Postman Collection](backend/BetterStreets_Postman_Collection.json)** - API testing
 
 ## 🛠️ Tech Stack
 
-### Frontend (Mobile)
-- **Framework**: React Native 0.76.5 with Expo SDK 54
-- **UI**: expo-linear-gradient, Ionicons
-- **Navigation**: React Navigation 7 (Tab + Stack)
-- **State**: React Context API (AuthContext, OfflineContext)
-- **Storage**: AsyncStorage (offline capability)
-- **Location**: expo-location (GPS capture)
-- **Camera**: expo-image-picker
-- **Notifications**: expo-notifications + expo-server-sdk
-- **Network**: @react-native-community/netinfo
+**Mobile App:**
+- React Native + Expo SDK 54
+- React Navigation
+- Expo Camera, Location, Image Picker
+- AsyncStorage for offline capability
 
-### Frontend (Admin Dashboard)
-- **Framework**: React 18 + Vite 5
-- **Styling**: Tailwind CSS 3
-- **Routing**: React Router v6
-- **Icons**: Lucide React
-- **Maps**: React Leaflet + OpenStreetMap
-- **HTTP**: Axios
-- **Notifications**: React Hot Toast
+**Backend:**
+- Node.js + Express.js
+- MongoDB + Mongoose ODM
+- JWT authentication
+- Nodemailer (Gmail SMTP for OTP)
+- Multer (file uploads)
 
-### Backend
-- **Runtime**: Node.js 18+
-- **Framework**: Express 4
-- **Database**: MongoDB 7.0 with Mongoose 8
-- **Authentication**: JWT + bcryptjs
-- **File Upload**: Multer
-- **Push Notifications**: expo-server-sdk
-- **Validation**: express-validator
+**Admin Dashboard:**
+- React 18 + Vite
+- Tailwind CSS
+- React Router
+- Axios for API calls
+- Lucide React icons
 
-### Database Collections
-1. **users** - User accounts (residents & admins)
-2. **report** - Issue reports with status history
-3. **categories** - Report categories with keywords
-4. **announcements** - Official barangay announcements
+## 📂 Project Structure
+
+```
+BetterStreets/
+├── src/                    # Mobile app source code
+├── backend/                # Node.js API server
+├── admin-dashboard/        # React admin panel
+├── assets/                 # App images and icons
+└── INSTALLATION_INSTRUCTIONS.md
+```
+
+## 🔑 Default Credentials
+
+**Admin Dashboard:**
+- Email: `betterstreetschatgpt@gmail.com`
+- Password: `admin123`
+
+## 🌐 Running the Complete System
+
+You need 3 terminals running simultaneously:
+
+**Terminal 1 - Backend:**
+```bash
+cd backend
+npm run dev
+```
+
+**Terminal 2 - Mobile App:**
+```bash
+npm start
+```
+
+**Terminal 3 - Admin Dashboard:**
+```bash
+cd admin-dashboard
+npm run dev
+```
+
+## 📱 Testing the Mobile App
+
+- **Android/iOS:** Install Expo Go app, scan QR code
+- **Web:** Press `w` in terminal
+- **Emulator:** Press `a` (Android) or `i` (iOS)
+
+## 👥 User Roles
+
+- **Resident:** Submit and track community issue reports
+- **Barangay Worker:** Update report status and manage assigned issues
+- **Admin:** Full system access, manage all reports and announcements
+
+## 📧 Contact
+
+For issues or questions, please refer to the documentation files or check the thesis documentation.
+
+## 📄 License
+
+This project is developed for Barangay Camaman-an, Cagayan de Oro City.
 
 ---
 
-## Prerequisites
+**Built with ❤️ for better communities**
 
-Before you begin, ensure you have:
-- **Node.js** (v16 or higher)
-- **npm** or **yarn**
-- **Expo CLI**: `npm install -g expo-cli`
-- **Expo Go** app on your mobile device (for testing)
-
-## Installation
-
-1. **Clone or navigate to the project directory**
-   ```bash
-   cd BetterStreets
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Configure API endpoint**
-   
-   Update the API base URL in `src/utils/constants.js`:
-   ```javascript
    export const API_CONFIG = {
      BASE_URL: 'http://your-backend-url.com/api', // Replace with your backend URL
      TIMEOUT: 10000,
