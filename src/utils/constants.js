@@ -1,8 +1,8 @@
 // API Configuration
-// IMPORTANT: Replace 192.168.1.91 with YOUR computer's IP address
-// To find your IP: Run 'ipconfig' in PowerShell and look for IPv4 Address
+// For Android Emulator: Use 10.0.2.2 to connect to host machine
+// For Physical Device: Use your computer's IP (192.168.1.91)
 export const API_CONFIG = {
-  BASE_URL: 'http://192.168.1.91:3000/api', // UPDATE THIS WITH YOUR IP!
+  BASE_URL: 'http://10.0.2.2:3000/api', // Android Emulator uses 10.0.2.2
   TIMEOUT: 10000,
 };
 

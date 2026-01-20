@@ -7,7 +7,7 @@ const createSpecificAdmin = async () => {
     await mongoose.connect(process.env.MONGODB_URI);
     console.log('MongoDB Connected');
 
-    const email = 'betterstreetschatgpt@gmail.com';
+    const email = 'betterstreetsph@gmail.com';
     
     const existingAdmin = await User.findOne({ email });
     if (existingAdmin) {

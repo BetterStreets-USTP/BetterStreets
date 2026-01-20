@@ -7,7 +7,7 @@ export default function Announcements() {
   const [announcements, setAnnouncements] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showModal, setShowModal] = useState(false);
-  const [formData, setFormData] = useState({ title: '', message: '', _id: null });
+  const [formData, setFormData] = useState({ title: '', content: '', category: 'General', priority: 'normal', _id: null });
 
   useEffect(() => {
     fetchAnnouncements();
@@ -31,18 +31,22 @@ export default function Announcements() {
       if (formData._id) {
         await api.put(`/announcements/${formData._id}`, {
           title: formData.title,
-          message: formData.message
+          content: formData.content,
+          category: formData.category,
+          priority: formData.priority
         });
         toast.success('Announcement updated successfully');
       } else {
         await api.post('/announcements', {
           title: formData.title,
-          message: formData.message
+          content: formData.content,
+          category: formData.category || 'General',
+          priority: formData.priority || 'normal'
         });
         toast.success('Announcement created successfully');
       }
       setShowModal(false);
-      setFormData({ title: '', message: '', _id: null });
+      setFormData({ title: '', content: '', category: 'General', priority: 'normal', _id: null });
       fetchAnnouncements();
     } catch (error) {
       console.error('Error saving announcement:', error);
@@ -53,7 +57,9 @@ export default function Announcements() {
   const handleEdit = (announcement) => {
     setFormData({
       title: announcement.title,
-      message: announcement.message,
+      content: announcement.content || announcement.message,
+      category: announcement.category || 'General',
+      priority: announcement.priority || 'normal',
       _id: announcement._id
     });
     setShowModal(true);
@@ -94,7 +100,7 @@ export default function Announcements() {
         </div>
         <button
           onClick={() => {
-            setFormData({ title: '', message: '', _id: null });
+            setFormData({ title: '', content: '', category: 'General', priority: 'normal', _id: null });
             setShowModal(true);
           }}
           className="flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white rounded-xl hover:shadow-lg transition-all duration-300 font-semibold transform hover:scale-105"
@@ -133,7 +139,7 @@ export default function Announcements() {
             <h3 className="text-xl font-bold text-gray-900 mb-2 group-hover:text-emerald-600 transition-colors duration-300">
               {announcement.title}
             </h3>
-            <p className="text-gray-600 text-sm mb-4 line-clamp-3">{announcement.message}</p>
+            <p className="text-gray-600 text-sm mb-4 line-clamp-3">{announcement.content || announcement.message}</p>
             <div className="flex items-center justify-between pt-4 border-t border-gray-200">
               <div className="flex items-center gap-2 text-xs text-gray-500">
                 <Calendar className="w-4 h-4" />
@@ -199,13 +205,41 @@ export default function Announcements() {
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-2">Message</label>
                 <textarea
-                  value={formData.message}
-                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  value={formData.content}
+                  onChange={(e) => setFormData({ ...formData, content: e.target.value })}
                   required
                   rows={6}
                   className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all duration-300 font-medium resize-none"
                   placeholder="Enter announcement message"
                 />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
+                  <select
+                    value={formData.category}
+                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all duration-300 font-medium"
+                  >
+                    <option value="General">General</option>
+                    <option value="Emergency">Emergency</option>
+                    <option value="Event">Event</option>
+                    <option value="Maintenance">Maintenance</option>
+                    <option value="Update">Update</option>
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-2">Priority</label>
+                  <select
+                    value={formData.priority}
+                    onChange={(e) => setFormData({ ...formData, priority: e.target.value })}
+                    className="w-full px-4 py-3 border-2 border-gray-200 rounded-xl focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 transition-all duration-300 font-medium"
+                  >
+                    <option value="low">Low</option>
+                    <option value="normal">Normal</option>
+                    <option value="high">High</option>
+                  </select>
+                </div>
               </div>
               <div className="flex gap-3 pt-4">
                 <button

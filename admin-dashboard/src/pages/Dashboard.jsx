@@ -66,7 +66,7 @@ export default function Dashboard() {
         }).length;
         last7Days.push({
           date: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-          reports: count || Math.floor(Math.random() * 8) + 2
+          reports: count
         });
       }
       setTrendData(last7Days);

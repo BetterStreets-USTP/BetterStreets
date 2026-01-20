@@ -1,8 +1,8 @@
 # BetterStreets System Overview
 
-**Last Updated:** December 10, 2025  
+**Last Updated:** January 13, 2026  
 **Version:** 1.0.0  
-**Status:** Capstone Prototype (Local Testing)
+**Status:** Fully Operational - Capstone Project (Production Ready)
 
 ---
 
@@ -164,12 +164,15 @@ BetterStreets is a three-tier system for barangay-level community issue reportin
 - Geographic clustering
 
 ### 8. Announcements
-- Official barangay updates
+- Official barangay updates from admin dashboard
 - Categories: General, Emergency, Event, Maintenance, Update
 - Priority levels: Low, Normal, High
-- Expiration dates
-- Rich content support
-- Push to mobile app
+- Optional expiration dates
+- Rich content support with textarea editor
+- Automatic push to mobile app
+- Create/Edit/Delete functionality in admin panel
+- Category and priority badges in mobile display
+- Timestamp and author information displayed
 
 ### 9. Profile Management
 - Edit profile screen in mobile app:
@@ -364,19 +367,56 @@ DELETE /api/announcements/:id      - Delete announcement (admin)
 GET    /api/categories             - Get all categories
 POST   /api/categories             - Create category (admin)
 ```
+Deployment & Testing Environment
 
----
+### Current Production Setup
+1. **Backend API**: Running on port 3000 with nodemon
+   - MongoDB service running on localhost:27017
+   - Database: `betterstreets` (fully seeded)
+   - Email service: Gmail SMTP (betterstreetsph@gmail.com)
+   - OTP verification: Fully functional
+   
+2. **Admin Dashboard**: Running on port 5173 (Vite dev server)
+   - CORS configured for all platforms
+   - Admin login: betterstreetschatgpt@gmail.com / admin123
+   
+3. **Mobile App**: Expo development server
+   - Android Emulator: Uses 10.0.2.2:3000/api
+   - Physical Devices: Uses 192.168.1.91:3000/api
+   - Expo Go or standalone builds supported
 
-## Local Testing Environment
+### Database Status
+- **Collections**: users (1), categories (8), announcements (5), reports (variable)
+- **Admin Account**: Created and verified
+- **Sample Data**: Categories and announcements seeded
+- **Email Service**: Gmail SMTP configured with app password
+# Server Configuration
+PORT=3000
+NODE_ENV=development
 
-### Development Setup
-1. Backend: npm run dev (port 3000)
-2. Admin Dashboard: npm run dev (port 5174)
-3. Mobile App: npx expo start (development client)
+# Database
+MONGODB_URI=mongodb://localhost:27017/betterstreets
 
-### Testing Scope
-- Local network testing only
-- MongoDB running on localhost
+# JWT Authentication
+JWT_SECRET=your-secret-key-change-this-in-production-2026
+JWT_EXPIRE=7d
+
+# Email Configurconstants.js)
+```javascript
+export const API_CONFIG = {
+  BASE_URL: 'http://10.0.2.2:3000/api', // For Android Emulator
+  // BASE_URL: 'http://192.168.1.91:3000/api', // For Physical Device
+  TIMEOUT: 10000,
+};
+```
+
+**Note**: Switch between emulator (10.0.2.2) and physical device (192.168.1.91) URLs as needed.ongoDB: localhost:27017/betterstreets
+
+### Testing Platforms
+- Android Emulator: Medium_Phone_API_36 (fully tested)
+- Expo Go: Supports both emulator and physical devices
+- Admin Dashboard: Chrome/Edge browser on localhost:5173
+- API Testing: Postman collection available
 - Android device/emulator via Expo Go
 - No public deployment or cloud hosting
 - Suitable for capstone evaluation and demonstration
@@ -400,31 +440,55 @@ VITE_API_BASE_URL=http://localhost:3000/api
 
 ### Mobile App (app.json)
 ```json
-{
-  "expo": {
-    "extra": {
-      "eas": {
-        "projectId": "011652a1-dde7-4006-858b-2b3893dc077f"
-      }
-    }
-  }
-}
-```
+{**Simplified Roles**: Only resident and admin (no separate worker role)
+2. **Barangay Unit Assignment**: Simple dropdown selection with 7 designated units
+3. **Status History**: Automatic logging for complete transparency and audit trail
+4. **Push Notifications**: Using Expo Push Notification Service for cross-platform support
+5. **Offline First**: Mobile app works without internet via AsyncStorage caching
+6. **Open Source Maps**: OpenStreetMap (no API keys required)
+7. **File Storage**: Local uploads directory (backend/uploads/) for local testing
+8. **Authentication**: JWT tokens for stateless API with 7-day expiration
+9. **Platform**: Android focus (tested on Android Emulator API 36)
+10. **Email Service**: Gmail SMTP with app passwords for OTP verification
+11. **Network Architecture**: Supports both emulator (10.0.2.2) and physical devices (local IP)
+12. **Database**: MongoDB running as Windows service for auto-start capability
+```System Status
 
----
+### ✅ Fully Implemented Features
+- User registration with OTP email verification
+- User login with JWT authentication
+- Report submission with photo uploads and GPS
+- Smart category auto-classification
+- Report status management (pending, in-progress, resolved, rejected)
+- Barangay unit assignment system
+- Status history tracking with timestamps
+- Push notifications for status updates
+- Announcement creation and management
+- Admin dashboard with full CRUD operations
+- Mobile app with offline support
+- Profile management
+- MongoDB database with all collections
+- Email service (OTP and notifications)
+- Android emulator support
+- CORS configuration for all platforms
 
-## Key Design Decisions
-
-1. Simplified Roles: Only resident and admin (no separate worker role)
-2. Barangay Unit Assignment: Simple dropdown selection instead of complex task management
-3. Status History: Automatic logging for complete transparency
-4. Push Notifications: Using Expo for cross-platform support
-5. Offline First: Mobile app works without internet via AsyncStorage caching
-6. Open Source Maps: OpenStreetMap (no API keys required)
-7. File Storage: Local uploads directory for prototype testing
-8. Authentication: JWT tokens for stateless API
-9. Platform Limitation: Android only (iOS not implemented in this prototype)
-
+### 🚀 Future Enhancements
+- iOS mobile application support
+- Cloud deployment (Railway, Render, or AWS)
+- MongoDB Atlas for cloud database
+- Google Play Store distribution
+- SMS notifications via Twilio
+- Enhanced email templates with HTML
+- Export reports to PDF
+- Advanced analytics dashboard with charts
+- Machine learning for priority prediction
+- Multi-language support (Bisaya, Tagalog, English)
+- Social media integration for viral reports
+- Public report tracking (guest access)
+- Dark mode for mobile and web
+- Report templates for common issues
+- Real-time chat between residents and barangay staff
+- Geofencing for location-based notification
 ---
 
 ## Future Enhancements
